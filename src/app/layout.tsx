@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const initialState = cookieToInitialState(config, headers().get('cookie'))
-  console.log("initWorm :",contract?.functions?.initWorm("0x1234567890abcdef1234567890abcdef12345678","0xabcdef1234567890abcdef1234567890abcdef12","0x7890abcdef1234567890abcdef1234567890abcd"));
-  console.log("_set_States_ :", contract?.functions?._set_States_(10, 0, true, 1000000000000000000, 1));
+  // console.log("initWorm :",contract?.functions?.initWorm("0x1234567890abcdef1234567890abcdef12345678","0xabcdef1234567890abcdef1234567890abcdef12","0x7890abcdef1234567890abcdef1234567890abcd"));
+  // console.log("_set_States_ :", contract?.functions?._set_States_(10, 0, true, 1000000000000000000, 1));
 
   return (
     <ReduxProvider>
