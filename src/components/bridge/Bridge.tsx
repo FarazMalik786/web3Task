@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Wormhole, wormhole, amount, isTokenId, TokenTransfer } from '@wormhole-foundation/sdk';
 import evm from '@wormhole-foundation/sdk/evm';
 import solana from '@wormhole-foundation/sdk/solana';
+import { contract } from '@/app/ContractInteraction'
 
 const Bridge = () => {
   const [showNetworks, setShowNetworks] = useState<boolean>(false);
@@ -15,9 +16,9 @@ const Bridge = () => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
 
-  useEffect(()=>{
+  useEffect(() => {
     handleTransfer()
-  },[]);
+  }, []);
 
   const handleTransfer = async () => {
     setLoading(true);
@@ -25,6 +26,7 @@ const Bridge = () => {
 
     try {
       const wh = await wormhole("Testnet", [evm, solana]);
+      console.log("wh :", wh);
 
       const sendChain = wh.getChain("Avalanche");
       const rcvChain = wh.getChain("Solana");
@@ -35,6 +37,7 @@ const Bridge = () => {
       const nativeGas = automatic ? "0.01" : undefined;
 
       // Dummy signers (Replace with actual implementation)
+
       const source = { address: "source_address", signer: {} };
       const destination = { address: "destination_address", signer: {} };
 
@@ -44,6 +47,7 @@ const Bridge = () => {
 
       const normalizedAmount = amount.units(amount.parse(1, decimals));
       const xfer = await tokenTransfer(wh, {
+        rcvChain,
         token,
         amount: normalizedAmount,
         source,
@@ -64,37 +68,47 @@ const Bridge = () => {
   };
 
   async function tokenTransfer(wh: any, route: any) {
-    const xfer = await wh.tokenTransfer(
-      route.token,
-      route.amount,
-      route.source.address,
-      route.destination.address,
-      route.delivery.automatic,
-      // route.payload,
-      route.delivery.nativeGas
-    );
+    const params = {
+      targetChain: route.rcvChain, 
+      recipient: 1 ,  
+      amt: route.amount,  
+      token: route.token,  
+      dstGas: 200000,  
+      referal: '0xReferralAddress'  
+  };
+    const xfer = contract.functions.bridgeErc20(params)
+    // const xfer = await wh.tokenTransfer(
+    //   route.token,
+    //   route.amount,
+    //   route.source.address,
+    //   route.destination.address,
+    //   route.delivery.automatic,
+    //   // route.payload,
+    //   route.delivery.nativeGas
+    // )
+console.log("xfer :",xfer);
 
-    const quote = await TokenTransfer.quoteTransfer(
-      wh,
-      route.source.chain,
-      route.destination.chain,
-      xfer.transfer
-    );
-    console.log("wh :", quote);
 
-    if (xfer.transfer.automatic && quote.destinationToken.amount < 0) {
-      throw "The amount requested is too low to cover the fee and any native gas requested.";
-    }
+    // const quote = await TokenTransfer.quoteTransfer(
+    //   wh,
+    //   route.source.chain,
+    //   route.destination.chain,
+    //   xfer.transfer
+    // );
 
-    const srcTxids = await xfer.initiateTransfer(route.source.signer);
-    if (route.delivery.automatic) return xfer;
+    // if (xfer.transfer.automatic && quote.destinationToken.amount < 0) {
+    //   throw "The amount requested is too low to cover the fee and any native gas requested.";
+    // }
 
-    const attestIds = await xfer.fetchAttestation(60_000);
-    const destTxids = await xfer.completeTransfer(route.destination.signer);
+    // const srcTxids = await xfer.initiateTransfer(route.source.signer);
+    // if (route.delivery.automatic) return xfer;
+
+    // const attestIds = await xfer.fetchAttestation(60_000);
+    // const destTxids = await xfer.completeTransfer(route.destination.signer);
     return xfer;
   }
 
-  
+
 
   async function waitLog() {
     // Dummy wait logic (Replace with actual implementation)
