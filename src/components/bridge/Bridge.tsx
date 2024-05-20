@@ -7,11 +7,9 @@ import { Wormhole, wormhole, amount, isTokenId, TokenTransfer } from '@wormhole-
 import evm from '@wormhole-foundation/sdk/evm';
 import solana from '@wormhole-foundation/sdk/solana';
 import { contract } from '@/app/ContractInteraction'
-import { useWalletInfo } from '@web3modal/wagmi/react'
 import { useAccount } from 'wagmi'
 
 const Bridge = () => {
-  const { walletInfo } = useWalletInfo()
   const { address } = useAccount()
 
   const [showNetworks, setShowNetworks] = useState<boolean>(false);
@@ -40,24 +38,22 @@ const Bridge = () => {
 
       const sendChain = wh.getChain("Avalanche");
       const rcvChain = wh.getChain("Solana");
-console.log("rcvChain :",rcvChain);
 
-      const token = Wormhole.tokenId(sendChain.chain, "native");
+      const tokenAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+      
+      const token = Wormhole.tokenId(sendChain.chain, tokenAddress);
       const amt = "0.05";
       const automatic = true;
       const nativeGas = automatic ? "0.01" : undefined;
 console.log("token :",token);
-
       // Dummy signers (Replace with actual implementation)
 
       const source = { address: "source_address", signer: {} };
       const destination = { address: "destination_address", signer: {} };
 
-      const decimals = isTokenId(token)
-        ? Number(await wh.getDecimals(token.chain, token.address))
-        : sendChain.config.nativeTokenDecimals;
-
+      const decimals = sendChain.config.nativeTokenDecimals;
       const normalizedAmount = amount.units(amount.parse(1, decimals));
+      
       const xfer = await tokenTransfer(wh, {
         rcvChain,
         token,
@@ -80,6 +76,7 @@ console.log("token :",token);
   };
 
   async function tokenTransfer(wh: any, route: any) {
+    
     const params = {
       targetChain: route.rcvChain.config.nativeChainId, 
       recipient: address ,  
