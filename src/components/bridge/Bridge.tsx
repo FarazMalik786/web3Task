@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react'
 import { Networks, BridgeCard, TokenAssets } from "@/components"
 import { routing } from "@/assets"
 import Image from "next/image"
-import { Wormhole, wormhole, amount, isTokenId, TokenTransfer } from '@wormhole-foundation/sdk';
+import { Wormhole, wormhole, amount, isTokenId, TokenTransfer ,ChainId, chainIds} from '@wormhole-foundation/sdk';
 import evm from '@wormhole-foundation/sdk/evm';
 import solana from '@wormhole-foundation/sdk/solana';
 import { contract } from '@/app/ContractInteraction'
 import { useAccount } from 'wagmi'
+import { getChainId } from 'viem/actions'
 
 const Bridge = () => {
   const { address } = useAccount()
@@ -38,14 +39,15 @@ const Bridge = () => {
 
       const sendChain = wh.getChain("Avalanche");
       const rcvChain = wh.getChain("Solana");
-
       const tokenAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
       
       const token = Wormhole.tokenId(sendChain.chain, tokenAddress);
+
+      // Call the getChainId function and pass the client instance
+      
       const amt = "0.05";
       const automatic = true;
       const nativeGas = automatic ? "0.01" : undefined;
-console.log("token :",token);
       // Dummy signers (Replace with actual implementation)
 
       const source = { address: "source_address", signer: {} };
@@ -78,16 +80,22 @@ console.log("token :",token);
   async function tokenTransfer(wh: any, route: any) {
     
     const params = {
-      targetChain: route.rcvChain.config.nativeChainId, 
+      targetChain: 43114, 
       recipient: address ,  
       amt: route.amount,  
-      token: route.token,  
+      token: route.token.address.address,  
       dstGas: 200000,  
       referal: address  
   };
   console.log("params :",params);
   
-    const xfer = contract.functions.bridgeErc20(params)
+    const xfer = await contract.functions.bridgeErc20(params).then((res)=>{
+      console.log("res :",res);
+      
+    }).catch((e)=>{
+console.log("e :",e);
+
+    })
     // const xfer = await wh.tokenTransfer(
     //   route.token,
     //   route.amount,
