@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { Networks, BridgeCard, TokenAssets } from "@/components"
 import { routing } from "@/assets"
 import Image from "next/image"
-import { Wormhole, wormhole, amount, isTokenId, TokenTransfer ,ChainId, chainIds} from '@wormhole-foundation/sdk';
+import { Wormhole, wormhole, amount, isTokenId, TokenTransfer, ChainId, chainIds } from '@wormhole-foundation/sdk';
 import evm from '@wormhole-foundation/sdk/evm';
 import solana from '@wormhole-foundation/sdk/solana';
 import { contract } from '@/app/ContractInteraction'
@@ -20,7 +20,7 @@ const Bridge = () => {
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
 
- 
+
 
   useEffect(() => {
     handleTransfer()
@@ -29,9 +29,9 @@ const Bridge = () => {
   const handleTransfer = async () => {
     setLoading(true);
     setError(null);
-    
+
     if (!Boolean(address)) {
-      return  setLoading(false);
+      return setLoading(false);
     }
 
     try {
@@ -40,11 +40,10 @@ const Bridge = () => {
       const sendChain = wh.getChain("Avalanche");
       const rcvChain = wh.getChain("Solana");
       const tokenAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
-      
       const token = Wormhole.tokenId(sendChain.chain, tokenAddress);
 
       // Call the getChainId function and pass the client instance
-      
+
       const amt = "0.05";
       const automatic = true;
       const nativeGas = automatic ? "0.01" : undefined;
@@ -55,7 +54,7 @@ const Bridge = () => {
 
       const decimals = sendChain.config.nativeTokenDecimals;
       const normalizedAmount = amount.units(amount.parse(1, decimals));
-      
+
       const xfer = await tokenTransfer(wh, {
         rcvChain,
         token,
@@ -78,22 +77,22 @@ const Bridge = () => {
   };
 
   async function tokenTransfer(wh: any, route: any) {
-    
+
     const params = {
-      targetChain: 43114, 
-      recipient: address ,  
-      amt: route.amount,  
-      token: route.token.address.address,  
-      dstGas: 200000,  
-      referal: address  
-  };
-  console.log("params :",params);
-  
-    const xfer = await contract.functions.bridgeErc20(params).then((res)=>{
-      console.log("res :",res);
-      
-    }).catch((e)=>{
-console.log("e :",e);
+      targetChain: route.rcvChain?.config?.chainId,
+      recipient: address,
+      amt: route.amount,
+      token: route.token.address.address,
+      dstGas: 200000,
+      referal: address
+    };
+    console.log("params :", params);
+
+    const xfer = await contract.functions.bridgeErc20(params).then((res) => {
+      console.log("res :", res);
+
+    }).catch((e) => {
+      console.log("e :", e);
 
     })
     // const xfer = await wh.tokenTransfer(
@@ -105,7 +104,7 @@ console.log("e :",e);
     //   // route.payload,
     //   route.delivery.nativeGas
     // )
-console.log("xfer :",xfer);
+    console.log("xfer :", xfer);
 
 
     // const quote = await TokenTransfer.quoteTransfer(
