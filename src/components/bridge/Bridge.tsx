@@ -7,14 +7,21 @@ import { Wormhole, wormhole, amount, isTokenId, TokenTransfer } from '@wormhole-
 import evm from '@wormhole-foundation/sdk/evm';
 import solana from '@wormhole-foundation/sdk/solana';
 import { contract } from '@/app/ContractInteraction'
+import { useWalletInfo } from '@web3modal/wagmi/react'
+import { useAccount } from 'wagmi'
 
 const Bridge = () => {
+  const { walletInfo } = useWalletInfo()
+  const { address } = useAccount()
+
   const [showNetworks, setShowNetworks] = useState<boolean>(false);
   const [showAssets, setShowAssets] = useState<boolean>(false);
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
+
+ 
 
   useEffect(() => {
     handleTransfer()
@@ -23,18 +30,23 @@ const Bridge = () => {
   const handleTransfer = async () => {
     setLoading(true);
     setError(null);
+    
+    if (!Boolean(address)) {
+      return  setLoading(false);
+    }
 
     try {
       const wh = await wormhole("Testnet", [evm, solana]);
-      console.log("wh :", wh);
 
       const sendChain = wh.getChain("Avalanche");
       const rcvChain = wh.getChain("Solana");
+console.log("rcvChain :",rcvChain);
 
       const token = Wormhole.tokenId(sendChain.chain, "native");
       const amt = "0.05";
       const automatic = true;
       const nativeGas = automatic ? "0.01" : undefined;
+console.log("token :",token);
 
       // Dummy signers (Replace with actual implementation)
 
@@ -69,13 +81,15 @@ const Bridge = () => {
 
   async function tokenTransfer(wh: any, route: any) {
     const params = {
-      targetChain: route.rcvChain, 
-      recipient: 1 ,  
+      targetChain: route.rcvChain.config.nativeChainId, 
+      recipient: address ,  
       amt: route.amount,  
       token: route.token,  
       dstGas: 200000,  
-      referal: '0xReferralAddress'  
+      referal: address  
   };
+  console.log("params :",params);
+  
     const xfer = contract.functions.bridgeErc20(params)
     // const xfer = await wh.tokenTransfer(
     //   route.token,
