@@ -62,7 +62,7 @@ const Header = () => {
                     </aside>
 
                     <div className="flex lg:hidden items-center gap-[10px]">
-                        <UserRound onClick={() => setOpenProfile(true)} className={`bg-[#fff] ${styles.avatar_bg_glassGradient} w-[35px] rounded-[50%] p-[5px] border-[1px] h-[35px] cursor-pointer `} />
+                        {/* <UserRound onClick={() => setOpenProfile(true)} className={`bg-[#fff] ${styles.avatar_bg_glassGradient} w-[35px] rounded-[50%] p-[5px] border-[1px] h-[35px] cursor-pointer `} /> */}
                         <Menu onClick={() => setOpenMobileMenu(true)} className={`w-[35px] h-[35px] cursor-pointer`} />
                     </div>
                 </nav>
