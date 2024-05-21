@@ -58,7 +58,7 @@ const Bridge = () => {
       const xfer = await tokenTransfer(wh, {
         rcvChain,
         token,
-        amount: normalizedAmount,
+        amount: 10000,
         source,
         destination,
         delivery: {
@@ -104,7 +104,7 @@ const Bridge = () => {
     //   // route.payload,
     //   route.delivery.nativeGas
     // )
-    console.log("xfer :", xfer);
+    // console.log("xfer :", xfer);
 
 
     // const quote = await TokenTransfer.quoteTransfer(
